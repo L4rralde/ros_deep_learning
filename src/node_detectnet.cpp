@@ -92,7 +92,6 @@ void img_callback( const sensor_msgs::ImageConstPtr input )
 	if((stamp - last_time) < 1.0/rate)
 		return;
 	last_time = stamp;
-	ROS_WARN("Stamp = %f",stamp);
 	// convert the image to reside on GPU
 	if( !input_cvt || !input_cvt->Convert(input) )
 	{
