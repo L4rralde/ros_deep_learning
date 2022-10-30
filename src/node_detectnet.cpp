@@ -40,7 +40,7 @@ Publisher<sensor_msgs::Image> overlay_pub = NULL;
 Publisher<vision_msgs::VisionInfo> info_pub = NULL;
 
 vision_msgs::VisionInfo info_msg;
-
+bool debug = 0;
 
 // triggered when a new subscriber connected
 void info_callback()
@@ -157,7 +157,7 @@ void img_callback( const sensor_msgs::ImageConstPtr input )
 	}
 
 	// generate the overlay (if there are subscribers)
-	if( ROS_NUM_SUBSCRIBERS(overlay_pub) > 0 )
+	if( ROS_NUM_SUBSCRIBERS(overlay_pub) > 0 && debug)
 		publish_overlay(detections, numDetections);
 }
 
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
 	ROS_DECLARE_PARAMETER("overlay_flags", overlay_str);
 	ROS_DECLARE_PARAMETER("mean_pixel_value", mean_pixel);
 	ROS_DECLARE_PARAMETER("threshold", threshold);
-
+	ROS_DECLARE_PARAMETER("debug", debug);
 
 	/*
 	 * retrieve parameters
@@ -211,6 +211,7 @@ int main(int argc, char **argv)
 	ROS_GET_PARAMETER("overlay_flags", overlay_str);
 	ROS_GET_PARAMETER("mean_pixel_value", mean_pixel);
 	ROS_GET_PARAMETER("threshold", threshold);
+	ROS_GET_PARAMETER("debug", debug);
 
 	overlay_flags = detectNet::OverlayFlagsFromStr(overlay_str.c_str());
 
