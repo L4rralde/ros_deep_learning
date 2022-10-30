@@ -41,6 +41,8 @@ Publisher<vision_msgs::VisionInfo> info_pub = NULL;
 
 vision_msgs::VisionInfo info_msg;
 bool debug = 0;
+float rate = 10.0;
+double last_time = 0.0;
 
 // triggered when a new subscriber connected
 void info_callback()
@@ -86,6 +88,11 @@ bool publish_overlay( detectNet::Detection* detections, int numDetections )
 // input image subscriber callback
 void img_callback( const sensor_msgs::ImageConstPtr input )
 {
+	double stamp = ROS_TIME_NOW().toSec();
+	if((stamp - last_time) < 1.0/rate)
+		return;
+	last_time = stamp;
+	ROS_WARN("Stamp = %f",stamp);
 	// convert the image to reside on GPU
 	if( !input_cvt || !input_cvt->Convert(input) )
 	{
@@ -197,6 +204,7 @@ int main(int argc, char **argv)
 	ROS_DECLARE_PARAMETER("mean_pixel_value", mean_pixel);
 	ROS_DECLARE_PARAMETER("threshold", threshold);
 	ROS_DECLARE_PARAMETER("debug", debug);
+	ROS_DECLARE_PARAMETER("rate", rate);
 
 	/*
 	 * retrieve parameters
@@ -212,6 +220,7 @@ int main(int argc, char **argv)
 	ROS_GET_PARAMETER("mean_pixel_value", mean_pixel);
 	ROS_GET_PARAMETER("threshold", threshold);
 	ROS_GET_PARAMETER("debug", debug);
+	ROS_GET_PARAMETER("rate", rate);
 
 	overlay_flags = detectNet::OverlayFlagsFromStr(overlay_str.c_str());
 
